@@ -2,7 +2,7 @@
 CurrentModule = Sandboxes
 ```
 
-# Sandboxes
+# API Reference
 
 ```@index
 ```

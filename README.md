@@ -1,5 +1,7 @@
 # Sandboxes
 
+[Docs](https://cmcaine.github.io/Sandboxes.jl/dev/)
+
 A simple sandboxing mechanism for evaluating Julia code in a restricted environment.
 You might want to use this if:
 
