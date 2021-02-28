@@ -19,6 +19,8 @@ A valid alternative method might be to use a compiler pass like Cassette, but I 
 
 ## API
 
+**This isn't implemented yet, I'm still deciding.** For now, check the tests to see how to use it.
+
 ```jl
 @sandboxed module M
     # Your safe interfaces here
