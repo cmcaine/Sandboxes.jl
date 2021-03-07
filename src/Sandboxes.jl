@@ -54,6 +54,20 @@ function sandboxify(ex)
         Expr(:using, _...) ||
         Expr(:import, _...) => error("Imports are not permitted in this sandbox: $ex")
 
+        # Can't use a macro to escape the sandbox
+        #
+        # At the moment, I can't work out how to make macro definition inside the
+        # sandbox safe (filtering the globalrefs in the macroexpand of the
+        # expression, maybe, but then that interferes with macros you've
+        # deliberately imported into the sandbox)
+        #
+        # Possibly I could put a special form inside the macro definitions that I
+        # then use as a signal to turn on sandboxing, but that seems like a bunch
+        # of work.
+        #
+        # So anyway, for now you can't define macros inside the sandbox at all.
+        Expr(:macro, _...) => error("Macro definitions are not permitted in this sandbox: $ex")
+
         # This allows trivial escape via `eval` and `Base`
         Expr(:module, true, _...) => error("You cannot define non-bare modules in this sandbox.")
 
