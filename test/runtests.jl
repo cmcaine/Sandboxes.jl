@@ -33,6 +33,14 @@ end
     @test s.eval == Core.eval
     @test_throws UndefVarError eval(sandboxed_eval_expr(s, :( eval ) ))
 
+    # Can't use a macro to escape the sandbox
+    @test_throws Exception sandboxify(:(macro x() :($(:Core)) end))
+
+    # Eventually it would be nice to allow macro definitions within the
+    # sandbox, so here's a broken test to remind us.
+    # eval(sandboxed_eval_expr(s, :(macro x() :($(:Core)) end)))
+    @test_broken eval(sandboxed_eval_expr(s, :(@x().eval))) != Core.eval
+
     # Until you define something with that name
     @test eval(sandboxed_eval_expr(s, :( eval() = "hello" ) )) != s.eval
     @test eval(sandboxed_eval_expr(s, :( eval() ) )) == "hello"
