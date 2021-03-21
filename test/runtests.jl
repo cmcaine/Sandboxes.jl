@@ -9,10 +9,12 @@ end
 @testset "Sandboxes.jl" begin
     s = baremod()
 
+    seval(expr) = eval(sandboxed_eval_expr(s, expr))
+
     # We can inject functionality into the sandbox
-    @test eval(sandboxed_eval_expr(s, :( nand(a, b) = $(~)($(&)(a, b)) ) )) == s.nand
-    @test eval(sandboxed_eval_expr(s, :( not(a) = nand(a, true) ) )) == s.not
-    @test eval(sandboxed_eval_expr(s, :( not(false) ) )) == true == s.not(false)
+    @test seval(:( nand(a, b) = $(~)($(&)(a, b)) ) ) == s.nand
+    @test seval(:( not(a) = nand(a, true) ) ) == s.not
+    @test seval(:( not(false) ) ) == true == s.not(false)
 
     # We can access properties and create symbols with names that are exported from Core
     @test_nothrow sandboxify( :( X.Int ) )
@@ -29,19 +31,19 @@ end
     @test_throws Exception sandboxify( :( module X end; X.eval ) )
 
     # Access to values of `Core` is denied
-    @test_throws UndefVarError eval(sandboxed_eval_expr(s, :( Core ) ))
+    @test_throws UndefVarError seval(:( Core ) )
     @test s.eval == Core.eval
-    @test_throws UndefVarError eval(sandboxed_eval_expr(s, :( eval ) ))
+    @test_throws UndefVarError seval(:( eval ) )
 
     # Can't use a macro to escape the sandbox
     @test_throws Exception sandboxify(:(macro x() :($(:Core)) end))
 
     # Eventually it would be nice to allow macro definitions within the
     # sandbox, so here's a broken test to remind us.
-    # eval(sandboxed_eval_expr(s, :(macro x() :($(:Core)) end)))
-    @test_broken eval(sandboxed_eval_expr(s, :(@x().eval))) != Core.eval
+    # seval(:(macro x() :($(:Core)) end)))
+    @test_broken seval(:(@x().eval)) != Core.eval
 
     # Until you define something with that name
-    @test eval(sandboxed_eval_expr(s, :( eval() = "hello" ) )) != s.eval
-    @test eval(sandboxed_eval_expr(s, :( eval() ) )) == "hello"
+    @test seval(:( eval() = "hello" ) ) != s.eval
+    @test seval(:( eval() ) ) == "hello"
 end
