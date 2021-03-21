@@ -23,6 +23,7 @@ Return an expression that, when evaluated in a baremodule, cannot:
 - access identifiers in `Core`
 - import other modules
 - define new modules (this would allow escape by `eval` or `.Core`)
+- define macros (this allows escape by returning `:(:Core)`)
 
 To punch holes in the sandbox, interpolate values into the expression like this:
 
