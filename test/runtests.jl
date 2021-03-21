@@ -43,6 +43,10 @@ end
     # seval(:(macro x() :($(:Core)) end)))
     @test_broken seval(:(@x().eval)) != Core.eval
 
+    # DataTypes let you get a reference to their defining module, which we
+    # should probably block :)
+    @test_broken seval(:(f(x::T) = T; f(1).name.module)) != Core
+
     # Until you define something with that name
     @test seval(:( eval() = "hello" ) ) != s.eval
     @test seval(:( eval() ) ) == "hello"
