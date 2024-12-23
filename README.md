@@ -1,5 +1,38 @@
 # Sandboxes
 
+## Archived
+
+Archived because this is mostly a silly idea and because I never finished it and don't want to give the impression that it actually allows safe execution of untrusted code.
+
+The main legacy of this project is a [PR merged into Julia](https://github.com/JuliaLang/julia/pull/40110) that allows defining very empty modules. Try that PR with:
+
+```jl
+my_sandbox = Core.Module(:x, false, false)
+@eval my_sandbox 1 # returns 1
+@eval my_sandbox 1 + 1 # UndefVarError: `+` not defined in `Main.sandbox`
+```
+
+See the [docs here](https://docs.julialang.org/en/v1/base/base/#Core.Module).
+
+Note that this sandbox can still be escaped with techniques like this:
+
+```jl
+@eval sandbox my_typeof(x::T) where T = T
+@eval sandbox my_typeof(1).name.module # Returns `Core`
+```
+
+Or
+
+```jl
+@eval sandbox using Core
+```
+
+`Sandboxes.sandboxed_eval_expr(sandbox, :(your expression here))` prevents `using` and `import`, but Sandboxes.jl does not stop the `my_typeof` escape, and there are probably several more.
+
+The chat that started this project can be [found here](https://julialang.zulipchat.com/#narrow/channel/274208-helpdesk-.28published.29/topic/Sandbox.20Julia.3F)
+
+## Introduction
+
 [Docs](https://cmcaine.github.io/Sandboxes.jl/dev/)
 
 A simple sandboxing mechanism for evaluating Julia code in a restricted environment.
